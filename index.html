@@ -1136,187 +1136,178 @@
         }
 
         // 2. VOICE RECOGNITION - FIXED VERSION
-        let recognition = null;
-        let isListening = false;
+        // VOICE RECOGNITION FOR NETLIFY/HTTPS
+let recognition = null;
+let isListening = false;
+
+function initVoiceRecognition() {
+    // Check if browser supports speech recognition
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        console.log('Speech recognition not supported in this browser');
+        document.getElementById('voiceToggleBtn').style.display = 'none';
+        return;
+    }
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+    
+    recognition.onstart = () => {
+        isListening = true;
+        document.getElementById('voiceToggleBtn').classList.add('listening');
+        document.getElementById('voiceInstructions').style.display = 'block';
+        showNotification('🎤 Listening... Speak now!');
+    };
+    
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.toLowerCase().trim();
+        console.log('Voice input:', transcript);
         
-        function initVoiceRecognition() {
-            // Check if browser supports speech recognition
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                document.getElementById('voiceToggleBtn').style.display = 'none';
-                console.log('Speech recognition not supported');
-                return;
+        // Process commands
+        if (transcript.includes('task')) {
+            const taskText = transcript.replace('task', '').trim();
+            if (taskText) {
+                document.getElementById('oneThingInput').value = taskText;
+                document.getElementById('saveOneThing').click();
+                showNotification(`✅ Task set: "${taskText}"`);
             }
-            
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false; // Single utterance
-            recognition.interimResults = false; // Only final results
-            recognition.lang = 'en-US';
-            recognition.maxAlternatives = 1;
-            
-            recognition.onstart = () => {
-                isListening = true;
-                document.getElementById('voiceToggleBtn').classList.add('listening');
-                document.getElementById('voiceInstructions').style.display = 'block';
-                showNotification('🎤 Listening... Speak now!');
-            };
-            
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript.toLowerCase().trim();
-                console.log('Voice input:', transcript);
-                
-                // Show what was heard
-                showNotification(`🎤 Heard: "${transcript}"`);
-                
-                // Process commands
-                if (transcript.includes('task')) {
-                    const taskText = transcript.replace('task', '').trim();
-                    if (taskText) {
-                        document.getElementById('oneThingInput').value = taskText;
-                        document.getElementById('saveOneThing').click();
-                        showNotification(`✅ Task set: "${taskText}"`);
-                    }
-                } 
-                else if (transcript.includes('evidence')) {
-                    const evidenceText = transcript.replace('evidence', '').trim();
-                    if (evidenceText) {
-                        document.getElementById('newEvidenceInput').value = evidenceText;
-                        document.getElementById('addEvidenceBtn').click();
-                        showNotification(`📝 Evidence logged: "${evidenceText}"`);
-                    }
-                }
-                else if (transcript.includes('idea')) {
-                    const ideaText = transcript.replace('idea', '').trim();
-                    if (ideaText) {
-                        document.getElementById('newIdeaInput').value = ideaText;
-                        document.getElementById('addIdeaBtn').click();
-                        showNotification(`💡 Idea added: "${ideaText}"`);
-                    }
-                }
-                else if (transcript.includes('energy up') || transcript.includes('recharge')) {
-                    document.getElementById('increaseEnergy').click();
-                    showNotification('⚡ Energy increased!');
-                }
-                else if (transcript.includes('energy down') || transcript.includes('drain')) {
-                    document.getElementById('decreaseEnergy').click();
-                    showNotification('⚡ Energy decreased');
-                }
-                else if (transcript.includes('stop')) {
-                    if (isListening) {
-                        isListening = false;
-                        document.getElementById('voiceToggleBtn').classList.remove('listening');
-                        document.getElementById('voiceInstructions').style.display = 'none';
-                        try {
-                            recognition.stop();
-                        } catch (e) {
-                            console.log('Error stopping:', e);
-                        }
-                        showNotification('🎤 Voice input stopped');
-                    }
-                }
-                else if (transcript.includes('test')) {
-                    showNotification('🎤 Voice is working!');
-                }
-                else {
-                    showNotification('🎤 Try: "task [your task]", "evidence [accomplishment]", or "energy up"');
-                }
-            };
-            
-            recognition.onerror = (event) => {
-                console.log('Voice error:', event.error);
-                
-                if (event.error === 'no-speech') {
-                    // No speech detected - this is normal
-                    if (isListening) {
-                        // Just show a message
-                        showNotification('🎤 No speech detected. Try again.');
-                    }
-                } else if (event.error === 'network') {
-                    showNotification('🎤 Network error. Check internet connection.');
-                } else if (event.error === 'not-allowed') {
-                    showNotification('🎤 Microphone access denied. Allow access in browser settings.');
-                    isListening = false;
-                    document.getElementById('voiceToggleBtn').classList.remove('listening');
-                    document.getElementById('voiceInstructions').style.display = 'none';
-                }
-            };
-            
-            recognition.onend = () => {
-                console.log('Voice recognition ended');
-                
-                // If we're still supposed to be listening, restart
-                if (isListening) {
-                    setTimeout(() => {
-                        try {
-                            recognition.start();
-                        } catch (e) {
-                            console.log('Error restarting:', e);
-                        }
-                    }, 100);
-                } else {
-                    document.getElementById('voiceToggleBtn').classList.remove('listening');
-                    document.getElementById('voiceInstructions').style.display = 'none';
-                }
-            };
-            
-            // Voice toggle button
-            document.getElementById('voiceToggleBtn').addEventListener('click', toggleVoiceRecognition);
+        } 
+        else if (transcript.includes('evidence')) {
+            const evidenceText = transcript.replace('evidence', '').trim();
+            if (evidenceText) {
+                document.getElementById('newEvidenceInput').value = evidenceText;
+                document.getElementById('addEvidenceBtn').click();
+                showNotification(`📝 Evidence logged: "${evidenceText}"`);
+            }
         }
+        else if (transcript.includes('idea')) {
+            const ideaText = transcript.replace('idea', '').trim();
+            if (ideaText) {
+                document.getElementById('newIdeaInput').value = ideaText;
+                document.getElementById('addIdeaBtn').click();
+                showNotification(`💡 Idea added: "${ideaText}"`);
+            }
+        }
+        else if (transcript.includes('energy up') || transcript.includes('recharge')) {
+            document.getElementById('increaseEnergy').click();
+            showNotification('⚡ Energy increased!');
+        }
+        else if (transcript.includes('energy down') || transcript.includes('drain')) {
+            document.getElementById('decreaseEnergy').click();
+            showNotification('⚡ Energy decreased');
+        }
+        else if (transcript.includes('stop')) {
+            stopVoiceRecognition();
+            showNotification('🎤 Voice stopped');
+        }
+        else if (transcript.includes('test')) {
+            showNotification('🎤 Voice is working!');
+        }
+        else {
+            showNotification(`🎤 Heard: "${transcript}" - Try "task workout"`);
+        }
+    };
+    
+    recognition.onerror = (event) => {
+        console.log('Voice error:', event.error);
         
-        function toggleVoiceRecognition() {
-            if (!recognition) return;
-            
-            if (isListening) {
-                // Stop listening
-                isListening = false;
-                document.getElementById('voiceToggleBtn').classList.remove('listening');
-                document.getElementById('voiceInstructions').style.display = 'none';
-                try {
-                    recognition.stop();
-                } catch (e) {
-                    console.log('Error stopping:', e);
-                }
-                showNotification('🎤 Voice input stopped');
-            } else {
-                // Start listening
-                // Request microphone permission first
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({ audio: true })
-                        .then(() => {
-                            isListening = true;
-                            document.getElementById('voiceToggleBtn').classList.add('listening');
-                            document.getElementById('voiceInstructions').style.display = 'block';
-                            try {
-                                recognition.start();
-                            } catch (e) {
-                                console.log('Error starting recognition:', e);
-                                showNotification('🎤 Error starting voice input');
-                                isListening = false;
-                                document.getElementById('voiceToggleBtn').classList.remove('listening');
-                                document.getElementById('voiceInstructions').style.display = 'none';
-                            }
-                        })
-                        .catch(err => {
-                            console.log('Microphone access error:', err);
-                            showNotification('🎤 Microphone access is required for voice input');
-                        });
-                } else {
-                    // Fallback for browsers without getUserMedia
-                    isListening = true;
-                    document.getElementById('voiceToggleBtn').classList.add('listening');
-                    document.getElementById('voiceInstructions').style.display = 'block';
+        if (event.error === 'network') {
+            showNotification('🎤 Voice requires internet connection');
+        } else if (event.error === 'not-allowed') {
+            showNotification('🎤 Allow microphone access in browser settings');
+            stopVoiceRecognition();
+        } else if (event.error === 'no-speech') {
+            // This is normal - no speech detected
+        }
+    };
+    
+    recognition.onend = () => {
+        console.log('Voice recognition ended');
+        if (isListening) {
+            // Auto-restart after a short delay
+            setTimeout(() => {
+                if (isListening) {
                     try {
                         recognition.start();
                     } catch (e) {
-                        console.log('Error starting recognition:', e);
-                        showNotification('🎤 Error starting voice input');
-                        isListening = false;
-                        document.getElementById('voiceToggleBtn').classList.remove('listening');
-                        document.getElementById('voiceInstructions').style.display = 'none';
+                        console.log('Error restarting:', e);
                     }
                 }
-            }
+            }, 500);
         }
+    };
+    
+    // Voice toggle button
+    document.getElementById('voiceToggleBtn').addEventListener('click', toggleVoiceRecognition);
+}
+
+function toggleVoiceRecognition() {
+    if (!recognition) {
+        showNotification('🎤 Voice not supported in this browser');
+        return;
+    }
+    
+    if (isListening) {
+        stopVoiceRecognition();
+        showNotification('🎤 Voice stopped');
+    } else {
+        startVoiceRecognition();
+    }
+}
+
+function startVoiceRecognition() {
+    // On HTTPS (Netlify), we need to handle permissions differently
+    if (window.location.protocol === 'https:' || window.location.hostname.includes('netlify')) {
+        // For HTTPS sites, we need user interaction to request microphone
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(() => {
+                isListening = true;
+                document.getElementById('voiceToggleBtn').classList.add('listening');
+                document.getElementById('voiceInstructions').style.display = 'block';
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.log('Error starting recognition:', e);
+                    showNotification('🎤 Error starting voice. Try refreshing.');
+                    stopVoiceRecognition();
+                }
+            })
+            .catch((error) => {
+                console.log('Microphone access denied:', error);
+                showNotification('🎤 Microphone access denied. Click the lock icon in address bar to allow.');
+                stopVoiceRecognition();
+            });
+    } else {
+        // For local HTTP
+        isListening = true;
+        document.getElementById('voiceToggleBtn').classList.add('listening');
+        document.getElementById('voiceInstructions').style.display = 'block';
+        try {
+            recognition.start();
+        } catch (e) {
+            console.log('Error starting recognition:', e);
+            showNotification('🎤 Error starting voice');
+            stopVoiceRecognition();
+        }
+    }
+}
+
+function stopVoiceRecognition() {
+    isListening = false;
+    document.getElementById('voiceToggleBtn').classList.remove('listening');
+    document.getElementById('voiceInstructions').style.display = 'none';
+    
+    if (recognition) {
+        try {
+            recognition.stop();
+        } catch (e) {
+            console.log('Error stopping recognition:', e);
+        }
+    }
+}
 
         // 3. DAILY EXECUTOR
         function initDailyExecutor() {
