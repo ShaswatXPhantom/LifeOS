@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeOS Dashboard</title>
+    
+    <!-- Clean manifest -->
+    <link rel="manifest" id="webmanifest">
+    <meta name="theme-color" content="#0a0e17">
+    <meta name="description" content="LifeOS - Your personal productivity dashboard">
+    
+    <!-- Fonts and Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dark-bg: #0a0e17;
+            --dark-card: #131720;
+            --dark-border: #1e2536;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-teal: #06b6d4;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            color: var(--accent-green);
+        }
+
+        .streak-counter {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .streak-counter .flame {
+            color: #ff6b00;
+            animation: flamePulse 2s infinite;
+        }
+
+        @keyframes flamePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            background-color: var(--dark-card);
+            color: var(--text-primary);
+            border: 1px solid var(--dark-border);
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-teal));
+            color: white;
+            border: none;
+        }
+
+        .btn-voice {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            border: none;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        /* Module Cards */
+        .module {
+            background-color: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 25px;
+            border: 1px solid var(--dark-border);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .module:hover {
+            border-color: var(--accent-teal);
+            transform: translateY(-5px);
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .module-title {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .module-icon {
+            color: var(--accent-green);
+            font-size: 22px;
+        }
+
+        /* 1. DAILY EXECUTOR */
+        .daily-executor {
+            grid-column: span 2;
+        }
+
+        .one-thing-container {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .one-thing-input {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .one-thing-input input {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 15px;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .one-thing-input input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .custom-checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--accent-green);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .custom-checkbox.checked {
+            background-color: var(--accent-green);
+        }
+
+        .custom-checkbox i {
+            color: white;
+            font-size: 16px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .custom-checkbox.checked i {
+            opacity: 1;
+        }
+
+        /* 2. SKILL FORGE */
+        .skill-progress {
+            margin-top: 20px;
+        }
+
+        .skill-item {
+            margin-bottom: 20px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .skill-name {
+            font-weight: 500;
+        }
+
+        .skill-percent {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: var(--dark-border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-teal));
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        .skill-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .skill-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--dark-border);
+            background-color: var(--dark-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .skill-btn:hover {
+            background-color: var(--accent-green);
+            color: white;
+        }
+
+        /* 3. BUSINESS ENGINE */
+        .idea-inbox {
+            margin-top: 20px;
+        }
+
+        .idea-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .idea-content {
+            flex: 1;
+        }
+
+        .idea-stage {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .stage-concept {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .stage-validation {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .stage-execution {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+        }
+
+        .idea-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .idea-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .idea-btn:hover {
+            color: var(--accent-green);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .add-idea {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Voice Input Button */
+        .voice-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .voice-btn.listening {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* 4. NETWORK INTELLIGENCE */
+        .contacts-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        .contacts-table th {
+            text-align: left;
+            padding: 12px 0;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .contacts-table td {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .last-contact {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* 5. HEALTH & ENERGY */
+        .energy-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .energy-level {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .energy-bank {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .energy-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent-green) 0%, var(--accent-teal) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .energy-circle::after {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            background-color: var(--dark-card);
+            border-radius: 50%;
+        }
+
+        .energy-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* 6. EVIDENCE BUILDER */
+        .evidence-log {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .evidence-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--accent-green);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .evidence-date {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .add-evidence {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* 7. CRISIS MANAGER */
+        .crisis-protocol {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius);
+        }
+
+        .crisis-title {
+            color: var(--danger);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .protocol-steps {
+            list-style-type: none;
+        }
+
+        .protocol-steps li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .protocol-steps li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+        }
+
+        /* Export Data Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--dark-card);
+            border-radius: var(--radius);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--dark-border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .data-export {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* Weekly Report Modal */
+        .weekly-report-content {
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .report-section {
+            margin-bottom: 30px;
+        }
+
+        .report-section h3 {
+            color: var(--accent-teal);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent-teal);
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .report-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: var(--radius);
+        }
+
+        .report-stat {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 5px;
+        }
+
+        /* Voice Instructions */
+        .voice-instructions {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            padding: 15px;
+            border-radius: var(--radius);
+            max-width: 300px;
+            box-shadow: var(--shadow);
+            z-index: 999;
+            display: none;
+        }
+
+        .voice-command {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .daily-executor {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .one-thing-input {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .module {
+                padding: 20px;
+            }
+            
+            .module-title {
+                font-size: 18px;
+            }
+            
+            .energy-bank {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .energy-circle::after {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h1>LifeOS</h1>
+                <div class="streak-counter" id="streakCounter">
+                    <i class="fas fa-fire flame"></i>
+                    <span id="streakDays">0</span> Day Streak
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn" id="weeklyReportBtn">
+                    <i class="fas fa-chart-bar"></i> Weekly Report
+                </button>
+                <button class="btn" id="exportBtn">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+                <button class="btn btn-primary" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset Day
+                </button>
+                <button class="btn btn-voice" id="voiceToggleBtn" title="Voice Input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <!-- 1. DAILY EXECUTOR -->
+            <div class="module daily-executor">
+                <div class="module-header">
+                    <div class="module-title">
+                        <i class="fas fa-check-circle module-icon"></i>
+                        DAILY EXECUTOR
+                    </div>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
+                <div class="one-thing-container">
+                    <h3>Today's One Thing</h3>
+                    <p style="margin-bottom: 15px; color: var(--text-secondary);">
+                        Focus on completing this single most important task today.
+                    </p>
+                    <div class="one-thing-input">
+                        <input type="text" id="oneThingInput" placeholder="What's your most important task today?">
+                        <button class="btn btn-primary" id="saveOneThing">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                    <div class="checkbox-container">
+                        <div class="custom-checkbox" id="oneThingCheckbox">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span id="oneThingText">No task set for today</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2. SKILL FORGE -->
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-title">
+                        <i class="fas fa-tools module-icon"></i>
+                        SKILL FORGE
+                    </div>
+                    <div class="skill-summary">Track your progress</div>
+                </div>
+                <div class="skill-progress">
+                    <div class="skill-item">
+                        <div class="skill-header">
+                            <span class="skill-name">HTML</span>
+                            <span class="skill-percent" id="htmlPercent">75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="htmlProgress" style="width: 75%"></div>
+                        </div>
+                        <div class="skill-controls">
+                            <button class="skill-btn" data-skill="html" data-action="decrease">-5%</button>
+                            <button class="skill-btn" data-skill="html" data-action="increase">+5%</button>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-header">
+                            <span class="skill-name">CSS</span>
+                            <span class="skill-percent" id="cssPercent">65%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="cssProgress" style="width: 65%"></div>
+                        </div>
+                        <div class="skill-controls">
+                            <button class="skill-btn" data-skill="css" data-action="decrease">-5%</button>
+                            <button class="skill-btn" data-skill="css" data-action="increase">+5%</button>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-header">
+                            <span class="skill-name">JavaScript</span>
+                            <span class="skill-percent" id="jsPercent">50%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="jsProgress" style="width: 50%"></div>
+                        </div>
+                        <div class="skill-controls">
+                            <button class="skill-btn" data-skill="js" data-action="decrease">-5%</button>
+                            <button class="skill-btn" data-skill="js" data-action="increase">+5%</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 3. BUSINESS ENGINE -->
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-title">
+                        <i class="fas fa-lightbulb module-icon"></i>
+                        BUSINESS ENGINE
+                    </div>
+                    <div class="idea-count">Ideas: <span id="ideaCount">3</span></div>
+                </div>
+                <div class="idea-inbox">
+                    <div id="ideaList"></div>
+                    <div class="add-idea">
+                        <input type="text" id="newIdeaInput" placeholder="New business idea..." style="flex: 1; background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--dark-border); border-radius: var(--radius); padding: 12px; color: var(--text-primary);">
+                        <button class="btn btn-primary" id="addIdeaBtn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4. NETWORK INTELLIGENCE -->
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-title">
+                        <i class="fas fa-users module-icon"></i>
+                        NETWORK INTELLIGENCE
+                    </div>
+                    <button class="btn" id="addContactBtn">
+                        <i class="fas fa-user-plus"></i> Add
+                    </button>
+                </div>
+                <table class="contacts-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Last Contact</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contactsTable"></tbody>
+                </table>
+            </div>
+            
+            <!-- 5. HEALTH & ENERGY -->
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-title">
+                        <i class="fas fa-battery-full module-icon"></i>
+                        HEALTH & ENERGY
+                    </div>
+                    <div class="energy-status" id="energyStatus">Optimal</div>
+                </div>
+                <div class="energy-container">
+                    <div class="energy-level" id="energyLevel">85%</div>
+                    <div class="energy-bank">
+                        <div class="energy-circle" id="energyCircle"></div>
+                    </div>
+                    <div class="energy-controls">
+                        <button class="btn" id="decreaseEnergy">
+                            <i class="fas fa-minus"></i> Drain
+                        </button>
+                        <button class="btn btn-primary" id="increaseEnergy">
+                            <i class="fas fa-plus"></i> Recharge
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 6. EVIDENCE BUILDER -->
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-title">
+                        <i class="fas fa-clipboard-check module-icon"></i>
+                        EVIDENCE BUILDER
+                    </div>
+                    <div class="evidence-count">Today: <span id="todayEvidenceCount">0</span></div>
+                </div>
+                <div class="evidence-log" id="evidenceLog">
+                    <div class="evidence-item">
+                        <div class="evidence-date">No evidence logged today yet</div>
+                        <div class="evidence-text">Start building your proof of progress!</div>
+                    </div>
+                </div>
+                <div class="add-evidence">
+                    <input type="text" id="newEvidenceInput" placeholder="What did you accomplish today?" style="flex: 1; background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--dark-border); border-radius: var(--radius); padding: 12px; color: var(--text-primary);">
+                    <button class="btn btn-primary" id="addEvidenceBtn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 7. CRISIS MANAGER -->
+            <div class="module">
+                <div class="module-header">
+                    <div class="module-title">
+                        <i class="fas fa-first-aid module-icon"></i>
+                        CRISIS MANAGER
+                    </div>
+                    <div class="crisis-indicator" id="crisisIndicator"></div>
+                </div>
+                <div class="crisis-protocol" id="crisisProtocol" style="display: none;">
+                    <div class="crisis-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        ENERGY CRISIS PROTOCOL
+                    </div>
+                    <ol class="protocol-steps">
+                        <li>Step away from all screens for 15 minutes</li>
+                        <li>Drink 500ml of water immediately</li>
+                        <li>Take 10 deep breaths (4-7-8 technique)</li>
+                        <li>Eat a protein-rich snack</li>
+                        <li>Do 5 minutes of light stretching</li>
+                        <li>Reassess energy in 30 minutes</li>
+                    </ol>
+                </div>
+                <div id="normalState">
+                    <p style="color: var(--text-secondary); margin-top: 20px;">
+                        Crisis protocol activates when energy drops below 30%. 
+                        Keep your energy bank above threshold for optimal performance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Export Data Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Export LifeOS Data</div>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <p>Copy the data below to save it externally:</p>
+            <div class="data-export" id="dataExport"></div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" id="copyDataBtn">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <button class="btn btn-primary" id="closeExportBtn">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Weekly Report Modal -->
+    <div class="modal" id="weeklyReportModal">
+        <div class="modal-content weekly-report-content">
+            <div class="modal-header">
+                <div class="modal-title">Weekly Report</div>
+                <button class="close-modal" id="closeWeeklyModal">&times;</button>
+            </div>
+            <div id="reportContent"></div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" id="printReportBtn">
+                    <i class="fas fa-print"></i> Print Report
+                </button>
+                <button class="btn" id="closeReportBtn">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Voice Instructions -->
+    <div class="voice-instructions" id="voiceInstructions">
+        <h4><i class="fas fa-microphone"></i> Voice Commands</h4>
+        <p>Try saying:</p>
+        <div class="voice-command">"task [your task]" - Set today's task</div>
+        <div class="voice-command">"evidence [accomplishment]" - Log evidence</div>
+        <div class="voice-command">"idea [business idea]" - Add new idea</div>
+        <div class="voice-command">"energy up" or "recharge" - Increase energy</div>
+        <div class="voice-command">"energy down" or "drain" - Decrease energy</div>
+        <div class="voice-command">"stop" - Stop voice input</div>
+    </div>
+
+    <script>
+        // Initialize data storage
+        let lifeOSData = {
+            dailyTask: {
+                text: '',
+                completed: false,
+                date: new Date().toDateString()
+            },
+            skills: {
+                html: 75,
+                css: 65,
+                js: 50
+            },
+            ideas: [
+                { id: 1, text: 'Build a productivity app for developers', stage: 'validation' },
+                { id: 2, text: 'Create an AI-powered learning platform', stage: 'concept' },
+                { id: 3, text: 'Develop a habit-tracking wearable', stage: 'execution' }
+            ],
+            contacts: [
+                { id: 1, name: 'Alex Johnson', lastContact: '2 days ago' },
+                { id: 2, name: 'Sam Wilson', lastContact: '1 week ago' },
+                { id: 3, name: 'Taylor Reed', lastContact: '3 days ago' },
+                { id: 4, name: 'Jordan Lee', lastContact: '2 weeks ago' }
+            ],
+            energy: 85,
+            evidence: [],
+            lastReset: new Date().toDateString(),
+            streak: {
+                days: 0,
+                lastLogin: new Date().toDateString()
+            },
+            weeklyStats: {
+                completedTasks: 0,
+                totalEvidence: 0,
+                energyLog: []
+            }
+        };
+
+        // Load saved data
+        const savedData = localStorage.getItem('lifeOSData');
+        if (savedData) {
+            try {
+                lifeOSData = JSON.parse(savedData);
+                // Check if it's a new day
+                const today = new Date().toDateString();
+                if (lifeOSData.lastReset !== today) {
+                    updateStreak();
+                    resetDailyData();
+                }
+            } catch (e) {
+                console.log('Error loading saved data:', e);
+            }
+        }
+
+        // Initialize the dashboard
+        function initDashboard() {
+            // Set current date
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Initialize modules
+            initDailyExecutor();
+            initSkillForge();
+            initBusinessEngine();
+            initNetworkIntelligence();
+            initHealthEnergy();
+            initEvidenceBuilder();
+            initCrisisManager();
+            initVoiceRecognition();
+            initWeeklyReport();
+            initNotifications();
+            
+            // Update streak display
+            updateStreakDisplay();
+            
+            // Update crisis manager based on initial energy
+            updateCrisisManager();
+        }
+
+        // 1. STREAK COUNTER
+        function updateStreak() {
+            const today = new Date().toDateString();
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toDateString();
+            
+            if (!lifeOSData.streak.lastLogin) {
+                lifeOSData.streak = {
+                    days: 1,
+                    lastLogin: today
+                };
+            } else if (lifeOSData.streak.lastLogin === yesterdayStr) {
+                lifeOSData.streak.days++;
+                lifeOSData.streak.lastLogin = today;
+            } else if (lifeOSData.streak.lastLogin === today) {
+                // Already logged in today
+            } else {
+                // Broken streak
+                lifeOSData.streak.days = 1;
+                lifeOSData.streak.lastLogin = today;
+            }
+            
+            updateStreakDisplay();
+            saveData();
+        }
+        
+        function updateStreakDisplay() {
+            document.getElementById('streakDays').textContent = lifeOSData.streak.days;
+            
+            // Animate flame for streaks
+            if (lifeOSData.streak.days >= 7) {
+                document.getElementById('streakCounter').style.background = 'linear-gradient(135deg, #ff6b00, #ffa500)';
+            } else if (lifeOSData.streak.days >= 3) {
+                document.getElementById('streakCounter').style.background = 'linear-gradient(135deg, #f59e0b, #fbbf24)';
+            }
+        }
+
+        // 2. VOICE RECOGNITION - FIXED VERSION
+        let recognition = null;
+        let isListening = false;
+        
+        function initVoiceRecognition() {
+            // Check if browser supports speech recognition
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                document.getElementById('voiceToggleBtn').style.display = 'none';
+                console.log('Speech recognition not supported');
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false; // Single utterance
+            recognition.interimResults = false; // Only final results
+            recognition.lang = 'en-US';
+            recognition.maxAlternatives = 1;
+            
+            recognition.onstart = () => {
+                isListening = true;
+                document.getElementById('voiceToggleBtn').classList.add('listening');
+                document.getElementById('voiceInstructions').style.display = 'block';
+                showNotification('🎤 Listening... Speak now!');
+            };
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase().trim();
+                console.log('Voice input:', transcript);
+                
+                // Show what was heard
+                showNotification(`🎤 Heard: "${transcript}"`);
+                
+                // Process commands
+                if (transcript.includes('task')) {
+                    const taskText = transcript.replace('task', '').trim();
+                    if (taskText) {
+                        document.getElementById('oneThingInput').value = taskText;
+                        document.getElementById('saveOneThing').click();
+                        showNotification(`✅ Task set: "${taskText}"`);
+                    }
+                } 
+                else if (transcript.includes('evidence')) {
+                    const evidenceText = transcript.replace('evidence', '').trim();
+                    if (evidenceText) {
+                        document.getElementById('newEvidenceInput').value = evidenceText;
+                        document.getElementById('addEvidenceBtn').click();
+                        showNotification(`📝 Evidence logged: "${evidenceText}"`);
+                    }
+                }
+                else if (transcript.includes('idea')) {
+                    const ideaText = transcript.replace('idea', '').trim();
+                    if (ideaText) {
+                        document.getElementById('newIdeaInput').value = ideaText;
+                        document.getElementById('addIdeaBtn').click();
+                        showNotification(`💡 Idea added: "${ideaText}"`);
+                    }
+                }
+                else if (transcript.includes('energy up') || transcript.includes('recharge')) {
+                    document.getElementById('increaseEnergy').click();
+                    showNotification('⚡ Energy increased!');
+                }
+                else if (transcript.includes('energy down') || transcript.includes('drain')) {
+                    document.getElementById('decreaseEnergy').click();
+                    showNotification('⚡ Energy decreased');
+                }
+                else if (transcript.includes('stop')) {
+                    if (isListening) {
+                        isListening = false;
+                        document.getElementById('voiceToggleBtn').classList.remove('listening');
+                        document.getElementById('voiceInstructions').style.display = 'none';
+                        try {
+                            recognition.stop();
+                        } catch (e) {
+                            console.log('Error stopping:', e);
+                        }
+                        showNotification('🎤 Voice input stopped');
+                    }
+                }
+                else if (transcript.includes('test')) {
+                    showNotification('🎤 Voice is working!');
+                }
+                else {
+                    showNotification('🎤 Try: "task [your task]", "evidence [accomplishment]", or "energy up"');
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                console.log('Voice error:', event.error);
+                
+                if (event.error === 'no-speech') {
+                    // No speech detected - this is normal
+                    if (isListening) {
+                        // Just show a message
+                        showNotification('🎤 No speech detected. Try again.');
+                    }
+                } else if (event.error === 'network') {
+                    showNotification('🎤 Network error. Check internet connection.');
+                } else if (event.error === 'not-allowed') {
+                    showNotification('🎤 Microphone access denied. Allow access in browser settings.');
+                    isListening = false;
+                    document.getElementById('voiceToggleBtn').classList.remove('listening');
+                    document.getElementById('voiceInstructions').style.display = 'none';
+                }
+            };
+            
+            recognition.onend = () => {
+                console.log('Voice recognition ended');
+                
+                // If we're still supposed to be listening, restart
+                if (isListening) {
+                    setTimeout(() => {
+                        try {
+                            recognition.start();
+                        } catch (e) {
+                            console.log('Error restarting:', e);
+                        }
+                    }, 100);
+                } else {
+                    document.getElementById('voiceToggleBtn').classList.remove('listening');
+                    document.getElementById('voiceInstructions').style.display = 'none';
+                }
+            };
+            
+            // Voice toggle button
+            document.getElementById('voiceToggleBtn').addEventListener('click', toggleVoiceRecognition);
+        }
+        
+        function toggleVoiceRecognition() {
+            if (!recognition) return;
+            
+            if (isListening) {
+                // Stop listening
+                isListening = false;
+                document.getElementById('voiceToggleBtn').classList.remove('listening');
+                document.getElementById('voiceInstructions').style.display = 'none';
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    console.log('Error stopping:', e);
+                }
+                showNotification('🎤 Voice input stopped');
+            } else {
+                // Start listening
+                // Request microphone permission first
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(() => {
+                            isListening = true;
+                            document.getElementById('voiceToggleBtn').classList.add('listening');
+                            document.getElementById('voiceInstructions').style.display = 'block';
+                            try {
+                                recognition.start();
+                            } catch (e) {
+                                console.log('Error starting recognition:', e);
+                                showNotification('🎤 Error starting voice input');
+                                isListening = false;
+                                document.getElementById('voiceToggleBtn').classList.remove('listening');
+                                document.getElementById('voiceInstructions').style.display = 'none';
+                            }
+                        })
+                        .catch(err => {
+                            console.log('Microphone access error:', err);
+                            showNotification('🎤 Microphone access is required for voice input');
+                        });
+                } else {
+                    // Fallback for browsers without getUserMedia
+                    isListening = true;
+                    document.getElementById('voiceToggleBtn').classList.add('listening');
+                    document.getElementById('voiceInstructions').style.display = 'block';
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.log('Error starting recognition:', e);
+                        showNotification('🎤 Error starting voice input');
+                        isListening = false;
+                        document.getElementById('voiceToggleBtn').classList.remove('listening');
+                        document.getElementById('voiceInstructions').style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // 3. DAILY EXECUTOR
+        function initDailyExecutor() {
+            if (lifeOSData.dailyTask.text) {
+                document.getElementById('oneThingText').textContent = lifeOSData.dailyTask.text;
+                document.getElementById('oneThingInput').value = lifeOSData.dailyTask.text;
+                
+                if (lifeOSData.dailyTask.completed) {
+                    document.getElementById('oneThingCheckbox').classList.add('checked');
+                    document.getElementById('oneThingText').style.textDecoration = 'line-through';
+                    document.getElementById('oneThingText').style.opacity = '0.7';
+                    
+                    // Update weekly stats
+                    lifeOSData.weeklyStats.completedTasks = (lifeOSData.weeklyStats.completedTasks || 0) + 1;
+                }
+            }
+            
+            document.getElementById('saveOneThing').addEventListener('click', () => {
+                const taskText = document.getElementById('oneThingInput').value.trim();
+                if (taskText) {
+                    lifeOSData.dailyTask.text = taskText;
+                    lifeOSData.dailyTask.date = new Date().toDateString();
+                    document.getElementById('oneThingText').textContent = taskText;
+                    saveData();
+                    showNotification('Task saved successfully!');
+                }
+            });
+            
+            document.getElementById('oneThingCheckbox').addEventListener('click', () => {
+                document.getElementById('oneThingCheckbox').classList.toggle('checked');
+                lifeOSData.dailyTask.completed = document.getElementById('oneThingCheckbox').classList.contains('checked');
+                
+                if (lifeOSData.dailyTask.completed) {
+                    document.getElementById('oneThingText').style.textDecoration = 'line-through';
+                    document.getElementById('oneThingText').style.opacity = '0.7';
+                    showNotification('Task completed! Great work!');
+                    
+                    // Update weekly stats
+                    lifeOSData.weeklyStats.completedTasks = (lifeOSData.weeklyStats.completedTasks || 0) + 1;
+                } else {
+                    document.getElementById('oneThingText').style.textDecoration = 'none';
+                    document.getElementById('oneThingText').style.opacity = '1';
+                    
+                    // Decrease weekly stats
+                    lifeOSData.weeklyStats.completedTasks = Math.max(0, (lifeOSData.weeklyStats.completedTasks || 1) - 1);
+                }
+                
+                saveData();
+            });
+        }
+
+        // 4. SKILL FORGE
+        function initSkillForge() {
+            updateSkillDisplay('html');
+            updateSkillDisplay('css');
+            updateSkillDisplay('js');
+            
+            document.querySelectorAll('.skill-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const skill = this.getAttribute('data-skill');
+                    const action = this.getAttribute('data-action');
+                    
+                    if (action === 'increase') {
+                        lifeOSData.skills[skill] = Math.min(100, lifeOSData.skills[skill] + 5);
+                    } else {
+                        lifeOSData.skills[skill] = Math.max(0, lifeOSData.skills[skill] - 5);
+                    }
+                    
+                    updateSkillDisplay(skill);
+                    saveData();
+                    showNotification(`${skill.toUpperCase()} skill updated to ${lifeOSData.skills[skill]}%`);
+                });
+            });
+        }
+        
+        function updateSkillDisplay(skill) {
+            const percent = lifeOSData.skills[skill];
+            document.getElementById(`${skill}Percent`).textContent = `${percent}%`;
+            document.getElementById(`${skill}Progress`).style.width = `${percent}%`;
+        }
+
+        // 5. BUSINESS ENGINE
+        function initBusinessEngine() {
+            renderIdeas();
+            
+            document.getElementById('addIdeaBtn').addEventListener('click', () => {
+                const ideaText = document.getElementById('newIdeaInput').value.trim();
+                if (ideaText) {
+                    const newIdea = {
+                        id: Date.now(),
+                        text: ideaText,
+                        stage: 'concept'
+                    };
+                    
+                    lifeOSData.ideas.unshift(newIdea);
+                    renderIdeas();
+                    document.getElementById('newIdeaInput').value = '';
+                    saveData();
+                    showNotification('New idea added!');
+                }
+            });
+        }
+        
+        function renderIdeas() {
+            const ideaList = document.getElementById('ideaList');
+            ideaList.innerHTML = '';
+            document.getElementById('ideaCount').textContent = lifeOSData.ideas.length;
+            
+            lifeOSData.ideas.forEach(idea => {
+                const ideaItem = document.createElement('div');
+                ideaItem.className = 'idea-item';
+                ideaItem.innerHTML = `
+                    <div class="idea-content">
+                        <div style="margin-bottom: 5px;">${idea.text}</div>
+                        <span class="idea-stage stage-${idea.stage}">${idea.stage.toUpperCase()}</span>
+                    </div>
+                    <div class="idea-actions">
+                        <button class="idea-btn" onclick="promoteIdea(${idea.id})">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="idea-btn" onclick="deleteIdea(${idea.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                ideaList.appendChild(ideaItem);
+            });
+        }
+        
+        window.promoteIdea = function(id) {
+            const idea = lifeOSData.ideas.find(i => i.id === id);
+            if (!idea) return;
+            
+            const stages = ['concept', 'validation', 'execution'];
+            const currentIndex = stages.indexOf(idea.stage);
+            if (currentIndex < stages.length - 1) {
+                idea.stage = stages[currentIndex + 1];
+                renderIdeas();
+                saveData();
+                showNotification('Idea promoted to next stage!');
+            }
+        };
+        
+        window.deleteIdea = function(id) {
+            lifeOSData.ideas = lifeOSData.ideas.filter(i => i.id !== id);
+            renderIdeas();
+            saveData();
+            showNotification('Idea deleted');
+        };
+
+        // 6. NETWORK INTELLIGENCE
+        function initNetworkIntelligence() {
+            renderContacts();
+            
+            document.getElementById('addContactBtn').addEventListener('click', () => {
+                const name = prompt("Enter contact name:");
+                if (name && name.trim()) {
+                    const newContact = {
+                        id: Date.now(),
+                        name: name.trim(),
+                        lastContact: 'Today'
+                    };
+                    
+                    lifeOSData.contacts.unshift(newContact);
+                    renderContacts();
+                    saveData();
+                    showNotification('Contact added!');
+                }
+            });
+        }
+        
+        function renderContacts() {
+            const contactsTable = document.getElementById('contactsTable');
+            contactsTable.innerHTML = '';
+            
+            lifeOSData.contacts.forEach(contact => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${contact.name}</td>
+                    <td class="last-contact">${contact.lastContact}</td>
+                    <td>
+                        <div class="contact-actions">
+                            <button class="btn" onclick="contactToday(${contact.id})">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                            <button class="btn" onclick="removeContact(${contact.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                contactsTable.appendChild(row);
+            });
+        }
+        
+        window.contactToday = function(id) {
+            const contact = lifeOSData.contacts.find(c => c.id === id);
+            if (!contact) return;
+            
+            contact.lastContact = 'Today';
+            renderContacts();
+            saveData();
+            showNotification('Contact updated!');
+        };
+        
+        window.removeContact = function(id) {
+            lifeOSData.contacts = lifeOSData.contacts.filter(c => c.id !== id);
+            renderContacts();
+            saveData();
+            showNotification('Contact removed');
+        };
+
+        // 7. HEALTH & ENERGY
+        function initHealthEnergy() {
+            updateEnergyDisplay();
+            
+            // Add energy to weekly log
+            if (!lifeOSData.weeklyStats.energyLog) {
+                lifeOSData.weeklyStats.energyLog = [];
+            }
+            lifeOSData.weeklyStats.energyLog.push(lifeOSData.energy);
+            
+            document.getElementById('decreaseEnergy').addEventListener('click', () => {
+                lifeOSData.energy = Math.max(0, lifeOSData.energy - 10);
+                updateEnergyDisplay();
+                updateCrisisManager();
+                checkLowEnergyNotification();
+                saveData();
+            });
+            
+            document.getElementById('increaseEnergy').addEventListener('click', () => {
+                lifeOSData.energy = Math.min(100, lifeOSData.energy + 10);
+                updateEnergyDisplay();
+                updateCrisisManager();
+                saveData();
+            });
+        }
+        
+        function updateEnergyDisplay() {
+            document.getElementById('energyLevel').textContent = `${lifeOSData.energy}%`;
+            
+            // Update energy circle
+            const angle = (lifeOSData.energy / 100) * 360;
+            document.getElementById('energyCircle').style.background = 
+                `conic-gradient(var(--accent-green) 0%, var(--accent-teal) ${angle}deg, var(--dark-border) ${angle}deg, var(--dark-border) 100%)`;
+            
+            // Update status text
+            if (lifeOSData.energy >= 70) {
+                document.getElementById('energyStatus').textContent = 'Optimal';
+                document.getElementById('energyStatus').style.color = '#10b981';
+            } else if (lifeOSData.energy >= 40) {
+                document.getElementById('energyStatus').textContent = 'Moderate';
+                document.getElementById('energyStatus').style.color = '#f59e0b';
+            } else if (lifeOSData.energy >= 30) {
+                document.getElementById('energyStatus').textContent = 'Low';
+                document.getElementById('energyStatus').style.color = '#f59e0b';
+            } else {
+                document.getElementById('energyStatus').textContent = 'Critical';
+                document.getElementById('energyStatus').style.color = '#ef4444';
+            }
+        }
+        
+        function updateCrisisManager() {
+            if (lifeOSData.energy < 30) {
+                document.getElementById('crisisProtocol').style.display = 'block';
+                document.getElementById('normalState').style.display = 'none';
+                document.getElementById('crisisIndicator').innerHTML = '<i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> ACTIVE';
+            } else {
+                document.getElementById('crisisProtocol').style.display = 'none';
+                document.getElementById('normalState').style.display = 'block';
+                document.getElementById('crisisIndicator').innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> STABLE';
+            }
+        }
+
+        // 8. EVIDENCE BUILDER
+        function initEvidenceBuilder() {
+            renderEvidence();
+            
+            document.getElementById('addEvidenceBtn').addEventListener('click', () => {
+                const evidenceText = document.getElementById('newEvidenceInput').value.trim();
+                if (evidenceText) {
+                    const newEvidence = {
+                        id: Date.now(),
+                        text: evidenceText,
+                        date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                        fullDate: new Date().toISOString()
+                    };
+                    
+                    lifeOSData.evidence.unshift(newEvidence);
+                    lifeOSData.weeklyStats.totalEvidence = (lifeOSData.weeklyStats.totalEvidence || 0) + 1;
+                    renderEvidence();
+                    document.getElementById('newEvidenceInput').value = '';
+                    saveData();
+                    showNotification('Evidence added!');
+                }
+            });
+        }
+        
+        function renderEvidence() {
+            const evidenceLog = document.getElementById('evidenceLog');
+            evidenceLog.innerHTML = '';
+            
+            // Filter today's evidence
+            const today = new Date().toDateString();
+            const todayEvidence = lifeOSData.evidence.filter(e => {
+                const evidenceDate = new Date(e.fullDate).toDateString();
+                return evidenceDate === today;
+            });
+            
+            document.getElementById('todayEvidenceCount').textContent = todayEvidence.length;
+            
+            if (todayEvidence.length === 0) {
+                evidenceLog.innerHTML = `
+                    <div class="evidence-item">
+                        <div class="evidence-date">No evidence logged today yet</div>
+                        <div class="evidence-text">Start building your proof of progress!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            todayEvidence.forEach(evidence => {
+                const evidenceItem = document.createElement('div');
+                evidenceItem.className = 'evidence-item';
+                evidenceItem.innerHTML = `
+                    <div class="evidence-date">${evidence.date}</div>
+                    <div class="evidence-text">${evidence.text}</div>
+                `;
+                
+                evidenceLog.appendChild(evidenceItem);
+            });
+        }
+
+        // 9. CRISIS MANAGER
+        function initCrisisManager() {
+            updateCrisisManager();
+        }
+
+        // 10. WEEKLY REPORT
+        function initWeeklyReport() {
+            document.getElementById('weeklyReportBtn').addEventListener('click', generateWeeklyReport);
+            document.getElementById('closeWeeklyModal').addEventListener('click', () => {
+                document.getElementById('weeklyReportModal').style.display = 'none';
+            });
+            document.getElementById('closeReportBtn').addEventListener('click', () => {
+                document.getElementById('weeklyReportModal').style.display = 'none';
+            });
+            document.getElementById('printReportBtn').addEventListener('click', () => {
+                window.print();
+            });
+        }
+        
+        function generateWeeklyReport() {
+            const reportContent = document.getElementById('reportContent');
+            
+            // Calculate date range
+            const today = new Date();
+            const lastWeek = new Date();
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            
+            // Calculate average energy
+            const energyLog = lifeOSData.weeklyStats.energyLog || [];
+            const avgEnergy = energyLog.length > 0 
+                ? Math.round(energyLog.reduce((a, b) => a + b, 0) / energyLog.length)
+                : lifeOSData.energy;
+            
+            reportContent.innerHTML = `
+                <div class="report-header">
+                    <h2>LifeOS Weekly Report</h2>
+                    <p>${lastWeek.toLocaleDateString()} - ${today.toLocaleDateString()}</p>
+                </div>
+                
+                <div class="report-section">
+                    <h3>Productivity Summary</h3>
+                    <div class="report-grid">
+                        <div class="report-item">
+                            <div class="report-stat">${lifeOSData.weeklyStats.completedTasks || 0}</div>
+                            <div>Tasks Completed</div>
+                        </div>
+                        <div class="report-item">
+                            <div class="report-stat">${lifeOSData.weeklyStats.totalEvidence || 0}</div>
+                            <div>Proofs of Progress</div>
+                        </div>
+                        <div class="report-item">
+                            <div class="report-stat">${lifeOSData.streak.days}</div>
+                            <div>Current Streak</div>
+                        </div>
+                        <div class="report-item">
+                            <div class="report-stat">${avgEnergy}%</div>
+                            <div>Avg. Energy Level</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <h3>Skill Progress</h3>
+                    <div class="report-grid">
+                        <div class="report-item">
+                            <div class="report-stat">${lifeOSData.skills.html}%</div>
+                            <div>HTML Skill Level</div>
+                        </div>
+                        <div class="report-item">
+                            <div class="report-stat">${lifeOSData.skills.css}%</div>
+                            <div>CSS Skill Level</div>
+                        </div>
+                        <div class="report-item">
+                            <div class="report-stat">${lifeOSData.skills.js}%</div>
+                            <div>JavaScript Skill Level</div>
+                        </div>
+                        <div class="report-item">
+                            <div class="report-stat">${lifeOSData.ideas.length}</div>
+                            <div>Total Ideas</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('weeklyReportModal').style.display = 'flex';
+        }
+
+        // 11. NOTIFICATIONS
+        function initNotifications() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                // Request permission when needed
+            } else if (Notification.permission === 'granted') {
+                // Permission already granted
+            }
+        }
+        
+        function checkLowEnergyNotification() {
+            if (lifeOSData.energy < 20) {
+                showLowEnergyNotification();
+            }
+        }
+        
+        function showLowEnergyNotification() {
+            if (!('Notification' in window)) return;
+            
+            if (Notification.permission === 'granted') {
+                createNotification();
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        createNotification();
+                    }
+                });
+            }
+            
+            function createNotification() {
+                const notification = new Notification('LifeOS - Energy Critical!', {
+                    body: `Your energy is at ${lifeOSData.energy}%. Consider taking a break!`,
+                    tag: 'energy-low'
+                });
+                
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+                
+                setTimeout(() => notification.close(), 10000);
+            }
+        }
+
+        // DATA MANAGEMENT
+        function saveData() {
+            localStorage.setItem('lifeOSData', JSON.stringify(lifeOSData));
+        }
+        
+        function resetDailyData() {
+            lifeOSData.dailyTask = {
+                text: lifeOSData.dailyTask.text,
+                completed: false,
+                date: new Date().toDateString()
+            };
+            
+            lifeOSData.evidence = [];
+            lifeOSData.lastReset = new Date().toDateString();
+            
+            // Reinitialize modules
+            initDailyExecutor();
+            initEvidenceBuilder();
+            
+            saveData();
+        }
+        
+        // EXPORT DATA
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const exportData = {
+                ...lifeOSData,
+                exportDate: new Date().toISOString()
+            };
+            
+            document.getElementById('dataExport').textContent = JSON.stringify(exportData, null, 2);
+            document.getElementById('exportModal').style.display = 'flex';
+        });
+        
+        document.getElementById('copyDataBtn').addEventListener('click', () => {
+            const text = document.getElementById('dataExport').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Data copied to clipboard!');
+            });
+        });
+        
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('exportModal').style.display = 'none';
+        });
+        
+        document.getElementById('closeExportBtn').addEventListener('click', () => {
+            document.getElementById('exportModal').style.display = 'none';
+        });
+        
+        // RESET DAY
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (confirm('Reset all daily data? Your skills, ideas, contacts, and streak will be preserved.')) {
+                resetDailyData();
+                showNotification('Daily data reset for a new day!');
+            }
+        });
+
+        // HELPER FUNCTIONS
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.right = '20px';
+            notification.style.backgroundColor = 'var(--dark-card)';
+            notification.style.color = 'var(--text-primary)';
+            notification.style.padding = '15px 20px';
+            notification.style.borderRadius = 'var(--radius)';
+            notification.style.borderLeft = '4px solid var(--accent-green)';
+            notification.style.boxShadow = 'var(--shadow)';
+            notification.style.zIndex = '1000';
+            notification.style.transition = 'var(--transition)';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // INITIALIZE EVERYTHING
+        document.addEventListener('DOMContentLoaded', initDashboard);
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('exportModal')) {
+                document.getElementById('exportModal').style.display = 'none';
+            }
+            if (e.target === document.getElementById('weeklyReportModal')) {
+                document.getElementById('weeklyReportModal').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
